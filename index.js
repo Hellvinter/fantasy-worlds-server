@@ -18,4 +18,8 @@ app.use(express.json());
 // Route Middlewares.
 app.use("/api/user", authRoute);
 
+// 2 lines below should delete them later it's just for checking things
+app.get("/", (req, res) => res.send("Hello World!"));
+app.get("/api/user/register", (req, res) => res.send("Registration page!"));
+
 app.listen(4000, () => console.log("Server up and running"));
