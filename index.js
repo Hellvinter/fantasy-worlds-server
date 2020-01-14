@@ -1,7 +1,11 @@
 const express = require("express");
+
+//const expressValidator = require("express-validator");
 const app = express();
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+
+const port = 4000;
 
 // Import Routes.
 const authRoute = require("./routes/auth");
@@ -22,4 +26,4 @@ app.use("/api/user", authRoute);
 app.get("/", (req, res) => res.send("Hello World!"));
 app.get("/api/user/register", (req, res) => res.send("Registration page!"));
 
-app.listen(4000, () => console.log("Server up and running"));
+app.listen(port, () => console.log(`Server up and running at port ${port}`));
