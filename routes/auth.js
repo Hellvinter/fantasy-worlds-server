@@ -1,22 +1,35 @@
 const router = require("express").Router();
-const User = require("../models/User");
-//const validation = require("../controller/validation");
+const User = require("../models/user");
+const bcrypt = require("bcryptjs");
+const { check, validationResult } = require("express-validator");
 
-router.post("/register", async (req, res) => {
-  //validation.registrationCheck0
-  //validation.registrationErrors();
+// REGISTRATION.
 
-  // User.create({
-  //   username: req.body.username,
-  //   email: req.body.email,
-  //   password: req.body.password
-  // }).then(user => res.json(user));
+// Validation condtitions of registration.
+const registrationCheck = [
+  check("username").isLength({ min: 2 }),
+  check("email").isEmail(),
+  check("password").isLength({ min: 6 })
+];
 
+router.post("/register", registrationCheck, async (req, res) => {
+  // Validation errors.
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+
+  // Hash passwords.
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+  // Create New user object.
   const user = new User({
     username: req.body.username,
     email: req.body.email,
-    password: req.body.password
+    password: hashedPassword
   });
+  // Success ? save user : throw error
   try {
     const savedUser = await user.save();
     res.send(savedUser);
@@ -24,5 +37,7 @@ router.post("/register", async (req, res) => {
     res.status(400).send(err);
   }
 });
+
+// LOGIN
 
 module.exports = router;
