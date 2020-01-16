@@ -1,17 +1,36 @@
 const router = require("express").Router();
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
-const { check, validationResult } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 
 // REGISTRATION.
 
 // Validation condtitions of registration.
+// Use body for validata only req.body
+// For cookies|header|params|query|body use check
 const registrationCheck = [
-  check("username").isLength({ min: 2 }),
-  check("email").isEmail(),
-  check("password").isLength({ min: 6 })
+  body("username").isLength({ min: 2 }),
+  body("email")
+    .isEmail()
+    .custom(req => {
+      return findUserByEmail(req).then(user => {
+        if (user) {
+          throw new Error("Email already in use");
+        }
+      });
+    }),
+  body("password").isLength({ min: 6 })
 ];
 
+// Custom validator doesn't works yet
+const findUserByEmail = (email, callback) => {
+  let query = User.findOne({ email: req.body.email });
+  if (query === email) {
+    return true;
+  } else return false;
+};
+
+// User creation
 router.post("/register", registrationCheck, async (req, res) => {
   // Validation errors.
   const errors = validationResult(req);
