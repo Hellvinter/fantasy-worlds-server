@@ -1,34 +1,27 @@
 const router = require("express").Router();
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
-const { check, validationResult } = require("express-validator");
+//const { check, validationResult } = require("express-validator");
 
 // REGISTRATION.
 
 // Validation condtitions of registration.
-const registrationCheck = [
-  check("username").isLength({ min: 2 }),
-  check("email").isEmail(),
-  check("password").isLength({ min: 6 })
-];
+// const registrationCheck = [
+//   check("username").isLength({ min: 2 }),
+//   check("email").isEmail(),
+//   check("password").isLength({ min: 6 })
+// ];
 
-// Custom validator doesn't works yet
-// const findUserByEmail = () => {
-//   let query = User.find();
-//   console.log(query);
-//   return query;
-// };
-
-const query = User.findOne({ type: String }, "email");
-console.log(query);
+// const query = User.find({ name: "Hellvinter" });
+// console.log(query);
 
 // User creation
-router.post("/register", registrationCheck, async (req, res) => {
+router.post("/register", async (req, res) => {
   // Validation errors.
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors.array() });
-  }
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return res.status(422).json({ errors: errors.array() });
+  // }
 
   // Hash passwords.
   const salt = await bcrypt.genSalt(10);
