@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 // REGISTRATION.
-router.post("/register", async (req, res) => {
+router.post("/registration", async (req, res) => {
   // Check that username already in database.
   const userNameExist = await User.findOne({ username: req.body.username });
   if (userNameExist) return res.status(400).send("Username already in use");
