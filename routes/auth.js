@@ -27,7 +27,7 @@ router.post("/registration", async (req, res) => {
 
   // Success ? save user : throw error
   try {
-    const savedUser = await user.save();
+    await user.save();
     res.send({ user: user._id });
   } catch (err) {
     res.status(400).send(err);
@@ -44,9 +44,23 @@ router.post("/login", async (req, res) => {
   const validPass = await bcrypt.compare(req.body.password, user.password);
   if (!validPass) return res.status(400).send("Invalid password");
 
-  //Create and assign a token
-  const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-  res.header("auth-token", token).send(token);
+  // Create and assign a token
+  // To make cookies based authentication.
+  // I should replase lines bellow
+  // const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET, {
+  //   expiresIn: "1h"
+  // });
+  // res.header("auth-token", token).send("Your cookies in the box");
+  try {
+    await res.cookie("username", user._id, {
+      domain: "http://localhost:3000/",
+      httpOnly: true,
+      maxAge: 3600000,
+      path: "/"
+    });
+  } catch (err) {
+    res.status(400).send(err);
+  }
 });
 
 module.exports = router;

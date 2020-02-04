@@ -26,7 +26,7 @@ app.use(express.json());
 app.use("/api/user", authRoute);
 app.use("/api/user", userDashboard);
 
-// 2 lines below should delete them later it's just for checking things
+// 3 lines below should delete them later it's just for checking things
 app.get("/", (req, res) => res.send("Hello World!"));
 app.get("/api/user/registration", (req, res) => res.send("Registration page!"));
 app.get("/api/user/dashboard", (req, res) => res.send("Dashboard page!"));
