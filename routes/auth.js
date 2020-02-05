@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const User = require("../models/user");
 //const jwt = require("jsonwebtoken");
-const session = require("cookie-session");
+const session = require("express-session");
 const bcrypt = require("bcryptjs");
 
 // REGISTRATION.
@@ -52,17 +52,24 @@ router.post("/login", async (req, res) => {
   //   expiresIn: "1h"
   // });
   // res.header("auth-token", token).send("Your cookies in the box");
-  let expiresDate = new Date(Date.now() + 60 * 60 * 1000);
+
+  // Code below kinda works but it's doesn't create session cookie unfortunatly
+  // Should solve this problem
   try {
     await res
       .header(
         session({
-          name: "user_session",
+          name: "user.session",
           secret: process.env.COOKIE_SECRET,
-          domain: "http://localhost:3000/",
-          httpOnly: true,
-          path: "/",
-          expires: expiresDate
+          resave: false,
+          saveUninitialized: false,
+          cookie: {
+            secret: process.env.COOKIE_SECRET,
+            domain: "http://localhost:3000/",
+            httpOnly: true,
+            path: "/",
+            expires: new Date(Date.now() + 60 * 60 * 1000)
+          }
         })
       )
       .send("Cookies in the jar");

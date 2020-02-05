@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const sessionTest = require("express-session");
 
 const port = 4000;
 
@@ -23,19 +23,36 @@ mongoose.connect(
 // Middlewares
 app.use(cors());
 app.use(express.json());
-app.use(cookieParser());
+//app.use(cookieParser());
 // Route Middlewares.
 app.use("/api/user", authRoute);
 app.use("/api/user", userDashboard);
+// Just to test express-session later should delete this
+app.use(
+  sessionTest({
+    name: "user.session",
+    secret: process.env.COOKIE_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secret: process.env.COOKIE_SECRET,
+      domain: "http://localhost:3000/",
+      httpOnly: true,
+      path: "/",
+      expires: new Date(Date.now() + 60 * 60 * 1000)
+    }
+  })
+);
 
 // 3 lines below should delete them later it's just for checking things
 app.get("/", (req, res) => {
-  res.cookie("username", "Don't tell ya", {
+  res.cookie("Wouldn't tell ya", "Testing", {
     HttpOnly: true,
     maxAge: 90000000,
     path: "/"
   });
   res.send("Hello World!");
+  console.log(req.sessionID);
 });
 app.get("/api/user/registration", (req, res) => res.send("Registration page"));
 app.get("/api/user/login", (req, res) => res.send("Login page"));
