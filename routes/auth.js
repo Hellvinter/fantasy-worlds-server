@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const User = require("../models/user");
-const jwt = require("jsonwebtoken");
+//const jwt = require("jsonwebtoken");
+const session = require("cookie-session");
 const bcrypt = require("bcryptjs");
 
 // REGISTRATION.
@@ -51,13 +52,20 @@ router.post("/login", async (req, res) => {
   //   expiresIn: "1h"
   // });
   // res.header("auth-token", token).send("Your cookies in the box");
+  let expiresDate = new Date(Date.now() + 60 * 60 * 1000);
   try {
-    await res.cookie("username", user._id, {
-      domain: "http://localhost:3000/",
-      httpOnly: true,
-      maxAge: 3600000,
-      path: "/"
-    });
+    await res
+      .header(
+        session({
+          name: "user_session",
+          secret: process.env.COOKIE_SECRET,
+          domain: "http://localhost:3000/",
+          httpOnly: true,
+          path: "/",
+          expires: expiresDate
+        })
+      )
+      .send("Cookies in the jar");
   } catch (err) {
     res.status(400).send(err);
   }
