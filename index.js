@@ -21,6 +21,27 @@ mongoose.connect(
   { useNewUrlParser: true, useUnifiedTopology: true },
   () => console.log("connected to db!")
 );
+
+//Session object
+const uniqueSession = session({
+  secret: process.env.COOKIE_SECRET,
+  resave: true,
+  saveUninitialized: false,
+  views: 1,
+  store: new mongoStore({
+    mongooseConnection: mongoose.connection,
+    secret: process.env.STORE_SECRET,
+    collection: "session",
+    touchAfter: 3600
+  }),
+  cookie: {
+    domain: "http://localhost:3000/",
+    httpOnly: true,
+    path: "/",
+    expires: new Date(Date.now() + 60 * 60 * 1000)
+  }
+});
+
 // Middlewares
 app.use(cors());
 app.use(express.json());
@@ -28,40 +49,29 @@ app.use(express.json());
 app.use("/api/user", authRoute);
 app.use("/api/user", userDashboard);
 // Just to test express-session later should delete this
-app.use(
-  session({
-    name: "user_session",
-    secret: process.env.COOKIE_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: new mongoStore({
-      mongooseConnection: mongoose.connection,
-      secret: process.env.STORE_SECRET,
-      collection: "session",
-      touchAfter: 3600
-    }),
-    cookie: {
-      domain: "http://localhost:3000/",
-      httpOnly: true,
-      path: "/",
-      expires: new Date(Date.now() + 60 * 60 * 1000)
-    }
-  })
-);
+app.use(uniqueSession);
 
+// I should some how push sessionID ot header
 app.get("/", (req, res) => {
-  req.sessionID;
-  // res.cookie just for checking things. Delete it later
-  // res.cookie("Wouldn't tell ya", "Testing", {
-  //   HttpOnly: true,
-  //   maxAge: 90000000,
-  //   path: "/"
-  // });
+  // let sess = req.session;
+  // if (sess.id.username) {
+  //   res.send("Hello user");
+  // }
+  //res.cookie just for checking things. Delete it later
+  //req.session;
+  res.cookie("user_session", req.session.id, req.session.cookie); // before I pass uniqueSession variable as third parametr
   res.send("Hello World!");
-  console.log(req.sessionID);
+  console.log(req.session.id);
 });
 app.get("/api/user/registration", (req, res) => res.send("Registration page"));
-app.get("/api/user/login", (req, res) => res.send("Login page"));
+app.get("/api/user/login", (req, res) => {
+  if (req.sessionID.usernmae) {
+    res.send("You are logged in");
+  } else {
+    res.send("Login page");
+  }
+  console.log(req.sessionID);
+});
 app.get("/api/user/dashboard", (req, res) => res.send("Dashboard page!"));
 
 app.listen(port, () => console.log(`Server up and running at port ${port}`));

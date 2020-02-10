@@ -59,8 +59,8 @@ router.post("/login", async (req, res) => {
   try {
     req.sessionID = user;
     res.send("Cookies in the jar");
-    console.log(req.sessionID);
-    //res.end()
+    console.log(req.sessionID.username);
+    //res.end();
   } catch (err) {
     res.status(400).send(err);
   }
