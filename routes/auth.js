@@ -89,14 +89,14 @@ router.post("/login", uniqueSession, async (req, res) => {
     // It's just don't create session if I try
     req.session;
     // With line below I should recognize each unique user.
-    req.session.name = user._id;
+    req.session.user = user.username;
+    req.session.user_id = user._id;
     // Somehow should pass cookies across the app.
     res.cookie("unique_user", req.session.id, uniqueSession.cookie);
     console.log(req.session);
-    //console.log(req.session.name);
     console.log(req.session.id);
     res.send("You are logged, check your cookies");
-    res.end();
+    //res.end();
   } catch (err) {
     res.status(400).send(err);
   }
