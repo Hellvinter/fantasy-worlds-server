@@ -23,7 +23,8 @@ mongoose.connect(
 
 //Session object
 // Thing below can work as a middleware for fuck sake it's the answer
-const uniqueSession = session({
+const userSession = session({
+  name: "guest",
   secret: process.env.COOKIE_SECRET,
   resave: true,
   saveUninitialized: false,
@@ -48,34 +49,24 @@ app.use(express.json());
 app.use("/api/user", authRoute);
 app.use("/api/user", userDashboard);
 // Just to test express-session later should move it to auth.
-//app.use(uniqueSession);
+//app.use(userSession);
 
-app.get("/", uniqueSession, (req, res) => {
+app.get("/", (req, res) => {
+  // pass userSession as middleware
   // Third param it's session object without that cookies don't show up.
   // I shoud either pass whole session object or session.cookie
-  res.cookie("user_session", req.session.id, uniqueSession.cookie);
-  res.cookie("just checking", "wubbaluba", {
-    domain: "http://localhost:3000/",
-    httpOnly: true,
-    path: "/",
-    expires: new Date(Date.now() + 60 * 60 * 1000)
-  });
+  // res.cookie("user_session", req.session.id, userSession.cookie);
   if (req.session) {
     res.send("Hello User");
   }
   if (!req.session) {
     res.send("Hello World!");
   }
-  console.log(req.session.id);
+  //console.log(req.session.id);
 });
 app.get("/api/user/registration", (req, res) => res.send("Registration page"));
 app.get("/api/user/login", (req, res) => {
-  if (req.session.id) {
-    res.send("You are logged in");
-  } else {
-    res.send("Login page");
-  }
-  console.log(req.session.id);
+  res.send("Login page");
 });
 app.get("/api/user/dashboard", (req, res) => res.send("Dashboard page!"));
 
