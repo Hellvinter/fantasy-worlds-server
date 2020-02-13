@@ -10,6 +10,7 @@ const port = 4000;
 
 // Import Routes.
 const authRoute = require("./routes/auth");
+// Route below do nothing for now
 const userDashboard = require("./routes/user_dashboard");
 
 dotenv.config();
@@ -22,7 +23,6 @@ mongoose.connect(
 );
 
 //Session object
-// Thing below can work as a middleware for fuck sake it's the answer
 const userSession = session({
   name: "guest",
   secret: process.env.COOKIE_SECRET,
@@ -48,14 +48,12 @@ app.use(express.json());
 // Route Middlewares.
 app.use("/api/user", authRoute);
 app.use("/api/user", userDashboard);
-// Just to test express-session later should move it to auth.
-//app.use(userSession);
 
 app.get("/", (req, res) => {
   // pass userSession as middleware
   // Third param it's session object without that cookies don't show up.
-  // I shoud either pass whole session object or session.cookie
-  // res.cookie("user_session", req.session.id, userSession.cookie);
+  // I shoud pass object(session).cookie.
+  //res.cookie("user_session", req.session.id, userSession.cookie);
   if (req.session) {
     res.send("Hello User");
   }
@@ -66,6 +64,7 @@ app.get("/", (req, res) => {
 });
 app.get("/api/user/registration", (req, res) => res.send("Registration page"));
 app.get("/api/user/login", (req, res) => {
+  // I think to pass cookies I should make something here
   res.send("Login page");
 });
 app.get("/api/user/dashboard", (req, res) => res.send("Dashboard page!"));

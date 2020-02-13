@@ -77,26 +77,22 @@ router.post("/login", uniqueSession, async (req, res) => {
   // });
   // res.header("auth-token", token).send("Your cookies in the box");
 
-  // Code below kinda works but it's doesn't create session cookie unfortunatly
-  // Should solve this problem.
-  // res.header don't do a thing
-  // INSTEAD
-  // use req.session
   try {
     // Session is working.
     // It's passed to DB.
     // Note: I can't manipulate session.id or sessionId
-    // It's just don't create session if I try
+    // But session don't recognized by app
     req.session;
     // With line below I should recognize each unique user.
+    req.session.name = "unique_user";
     req.session.user = user.username;
     req.session.user_id = user._id;
     // Somehow should pass cookies across the app.
-    res.cookie("unique_user", req.session.id, uniqueSession.cookie);
+    res.cookie(req.session.name, req.session.user_id, uniqueSession.cookie);
     console.log(req.session);
-    console.log(req.session.id);
+    //console.log(req.session.id);
     res.send("You are logged, check your cookies");
-    //res.end();
+    res.end();
   } catch (err) {
     res.status(400).send(err);
   }
